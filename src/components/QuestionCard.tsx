@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Question } from '../data/questions';
 import { useStore } from '../store/useStore';
 import { CheckCircle2, XCircle, Circle, Loader2 } from 'lucide-react';
@@ -27,6 +27,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
+  const translatingId = useRef<string | null>(null);
 
   useEffect(() => {
     setQuestion(initialQuestion);
@@ -37,10 +38,14 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
   useEffect(() => {
     const translateIfNeeded = async () => {
       if (language === 'bn' && question.text.bn === question.text.en) {
+        if (translatingId.current === question.id) return;
+        translatingId.current = question.id;
+        
         setIsTranslating(true);
         const translated = await translationService.translateQuestion(question);
         setQuestion(translated);
         setIsTranslating(false);
+        translatingId.current = null;
       }
     };
     translateIfNeeded();
@@ -56,8 +61,11 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     
     if (!isCorrect) {
       addWrongAnswer(question.id);
-    } else if (isReviewMode) {
-      removeWrongAnswer(question.id);
+    } else {
+      useStore.getState().addAnsweredQuestion(question.id);
+      if (isReviewMode) {
+        removeWrongAnswer(question.id);
+      }
     }
 
     if (onAnswer) {
@@ -87,7 +95,10 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
           </div>
         )}
         
-        <h3 className="text-xl font-semibold leading-snug tracking-tight text-foreground">
+        <h3 className={cn(
+          "text-xl font-semibold tracking-tight text-foreground",
+          language === 'bn' ? "leading-relaxed" : "leading-snug"
+        )}>
           {question.text[language]}
         </h3>
         
@@ -124,7 +135,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                     </motion.div>
                   )}
                 </div>
-                <span className="font-medium text-base leading-relaxed">{option.text[language]}</span>
+                <span className={cn(
+                  "font-medium text-base",
+                  language === 'bn' ? "leading-relaxed" : "leading-normal"
+                )}>
+                  {option.text[language]}
+                </span>
               </button>
             );
           })}

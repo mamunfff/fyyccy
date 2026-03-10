@@ -1,7 +1,6 @@
 import React from 'react';
-import { Moon, Sun, LogOut } from 'lucide-react';
+import { Moon, Sun, LogOut, Car } from 'lucide-react';
 import { useStore } from '../store/useStore';
-import { Logo } from './Logo';
 
 export const Header: React.FC = () => {
   const { theme, toggleTheme, language, toggleLanguage, logout } = useStore();
@@ -10,7 +9,9 @@ export const Header: React.FC = () => {
     <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border transition-all duration-300">
       <div className="container mx-auto max-w-md px-4 h-16 flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <Logo className="w-8 h-8 object-contain" />
+          <div className="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-lg text-primary">
+            <Car size={20} />
+          </div>
           <h1 className="text-sm font-black uppercase tracking-[0.2em] text-foreground">
             {language === 'bn' ? 'ইউকে থিওরি টেস্ট' : 'UK THEORY'}
           </h1>

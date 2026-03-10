@@ -10,7 +10,7 @@ export const Layout: React.FC = () => {
   const location = useLocation();
 
   return (
-    <div className={`min-h-screen flex flex-col ${theme === 'dark' ? 'dark' : ''}`}>
+    <div className="min-h-screen flex flex-col">
       <div className="flex-1 bg-background text-foreground pb-24 transition-colors duration-300">
         <Header />
         <main className="container mx-auto p-4 max-w-md relative">

@@ -1,23 +1,53 @@
-import React, { useState } from 'react';
-import { useStore } from '../store/useStore';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useStore, PracticeSettings } from '../store/useStore';
 import { questions, categories } from '../data/questions';
 import { QuestionCard } from '../components/QuestionCard';
-import { ChevronLeft, ChevronRight, ListFilter, LayoutGrid } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ListFilter, LayoutGrid, Settings, Check, AlertCircle, Zap } from 'lucide-react';
 import { cn } from '../components/BottomNav';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const Practice: React.FC = () => {
   const language = useStore((state) => state.language);
+  const practiceSettings = useStore((state) => state.practiceSettings);
+  const updatePracticeSettings = useStore((state) => state.updatePracticeSettings);
+  const answeredQuestions = useStore((state) => state.answeredQuestions);
+  
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showSettings, setShowSettings] = useState(false);
 
-  const filteredQuestions = selectedCategory === 'all'
-    ? questions
-    : selectedCategory 
-      ? questions.filter(q => q.categoryId === selectedCategory)
-      : [];
+  const filteredQuestions = useMemo(() => {
+    let qs = selectedCategory === 'all'
+      ? questions
+      : selectedCategory 
+        ? questions.filter(q => q.categoryId === selectedCategory)
+        : [];
+
+    if (practiceSettings.onlyNew) {
+      qs = qs.filter(q => !answeredQuestions.includes(q.id));
+    }
+
+    // Shuffle for variety if it's a limited test? 
+    // Or just slice. The user didn't ask for shuffle.
+    
+    if (practiceSettings.maxQuestions !== 'all' && qs.length > Number(practiceSettings.maxQuestions)) {
+      qs = qs.slice(0, Number(practiceSettings.maxQuestions));
+    }
+
+    return qs;
+  }, [selectedCategory, practiceSettings, answeredQuestions]);
 
   const currentQuestion = filteredQuestions[currentIndex];
+  const nextQuestion = filteredQuestions[currentIndex + 1];
+
+  useEffect(() => {
+    if (nextQuestion && language === 'bn' && nextQuestion.text.bn === nextQuestion.text.en) {
+      // Pre-translate the next question in the background
+      import('../services/translationService').then(({ translationService }) => {
+        translationService.translateQuestion(nextQuestion).catch(console.error);
+      });
+    }
+  }, [currentIndex, language, nextQuestion]);
 
   const handleNext = () => {
     if (currentIndex < filteredQuestions.length - 1) {
@@ -31,17 +61,126 @@ export const Practice: React.FC = () => {
     }
   };
 
+  const handleAnswer = (isCorrect: boolean) => {
+    if (!isCorrect && practiceSettings.alertIncorrect) {
+      // Simple alert for now, could be a toast
+      alert(language === 'bn' ? 'ভুল উত্তর! সঠিক উত্তরটি দেখুন।' : 'Incorrect answer! Check the correct one.');
+    }
+
+    if (isCorrect && practiceSettings.autoNext) {
+      setTimeout(() => {
+        handleNext();
+      }, 1500); // Small delay to show correct state
+    }
+  };
+
   if (!selectedCategory) {
     return (
       <div className="space-y-6 font-bengali">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="bg-primary/5 p-3 rounded-2xl">
-            <LayoutGrid className="text-primary" size={24} />
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="bg-primary/5 p-3 rounded-2xl">
+              <LayoutGrid className="text-primary" size={24} />
+            </div>
+            <h2 className="text-2xl font-black uppercase tracking-tight">
+              {language === 'bn' ? 'ক্যাটাগরি নির্বাচন করুন' : 'SELECT CATEGORY'}
+            </h2>
           </div>
-          <h2 className="text-2xl font-black uppercase tracking-tight">
-            {language === 'bn' ? 'ক্যাটাগরি নির্বাচন করুন' : 'SELECT CATEGORY'}
-          </h2>
+          <button 
+            onClick={() => setShowSettings(!showSettings)}
+            className={cn(
+              "p-3 rounded-2xl transition-all",
+              showSettings ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-accent"
+            )}
+          >
+            <Settings size={20} />
+          </button>
         </div>
+
+        <AnimatePresence>
+          {showSettings && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="bg-card border border-border rounded-3xl p-6 mb-6 space-y-4 shadow-sm">
+                <h3 className="font-black text-sm uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2">
+                  <Zap size={14} className="text-primary" />
+                  {language === 'bn' ? 'প্র্যাকটিস সেটিংস' : 'PRACTICE SETTINGS'}
+                </h3>
+                
+                <div className="grid gap-3">
+                  <button
+                    onClick={() => updatePracticeSettings({ onlyNew: !practiceSettings.onlyNew })}
+                    className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={cn("p-2 rounded-lg", practiceSettings.onlyNew ? "bg-primary/20 text-primary" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400")}>
+                        <Check size={16} />
+                      </div>
+                      <span className="font-bold text-sm">{language === 'bn' ? 'শুধুমাত্র নতুন প্রশ্ন' : 'Only new questions'}</span>
+                    </div>
+                    <div className={cn("w-10 h-5 rounded-full relative transition-colors", practiceSettings.onlyNew ? "bg-primary" : "bg-zinc-300 dark:bg-zinc-700")}>
+                      <div className={cn("absolute top-1 w-3 h-3 rounded-full bg-white transition-all", practiceSettings.onlyNew ? "right-1" : "left-1")} />
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => updatePracticeSettings({ autoNext: !practiceSettings.autoNext })}
+                    className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={cn("p-2 rounded-lg", practiceSettings.autoNext ? "bg-primary/20 text-primary" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400")}>
+                        <ChevronRight size={16} />
+                      </div>
+                      <span className="font-bold text-sm">{language === 'bn' ? 'অটো নেক্সট কোয়েশ্চেন' : 'Auto move next question'}</span>
+                    </div>
+                    <div className={cn("w-10 h-5 rounded-full relative transition-colors", practiceSettings.autoNext ? "bg-primary" : "bg-zinc-300 dark:bg-zinc-700")}>
+                      <div className={cn("absolute top-1 w-3 h-3 rounded-full bg-white transition-all", practiceSettings.autoNext ? "right-1" : "left-1")} />
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => updatePracticeSettings({ alertIncorrect: !practiceSettings.alertIncorrect })}
+                    className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={cn("p-2 rounded-lg", practiceSettings.alertIncorrect ? "bg-primary/20 text-primary" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400")}>
+                        <AlertCircle size={16} />
+                      </div>
+                      <span className="font-bold text-sm">{language === 'bn' ? 'ভুল উত্তরে অ্যালার্ট' : 'Alert if answer is incorrect'}</span>
+                    </div>
+                    <div className={cn("w-10 h-5 rounded-full relative transition-colors", practiceSettings.alertIncorrect ? "bg-primary" : "bg-zinc-300 dark:bg-zinc-700")}>
+                      <div className={cn("absolute top-1 w-3 h-3 rounded-full bg-white transition-all", practiceSettings.alertIncorrect ? "right-1" : "left-1")} />
+                    </div>
+                  </button>
+
+                  <div className="p-4 rounded-2xl bg-muted/30 space-y-3">
+                    <span className="font-bold text-sm block">{language === 'bn' ? 'সর্বোচ্চ প্রশ্ন সংখ্যা' : 'Maximum number of questions'}</span>
+                    <div className="flex flex-wrap gap-2">
+                      {[10, 20, 30, 40, 50, 'all'].map((num) => (
+                        <button
+                          key={num}
+                          onClick={() => updatePracticeSettings({ maxQuestions: num as any })}
+                          className={cn(
+                            "px-4 py-2 rounded-xl text-xs font-black transition-all",
+                            practiceSettings.maxQuestions === num 
+                              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
+                              : "bg-background border border-border text-muted-foreground hover:border-primary/50"
+                          )}
+                        >
+                          {num === 'all' ? (language === 'bn' ? 'সব' : 'ALL') : num}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         
         <div className="grid gap-3">
           <button
@@ -117,7 +256,10 @@ export const Practice: React.FC = () => {
           exit={{ opacity: 0, x: -20 }}
           transition={{ duration: 0.3 }}
         >
-          <QuestionCard question={currentQuestion} />
+          <QuestionCard 
+            question={currentQuestion} 
+            onAnswer={handleAnswer}
+          />
         </motion.div>
       ) : (
         <div className="text-center py-12 text-muted-foreground bg-card rounded-3xl border border-border">

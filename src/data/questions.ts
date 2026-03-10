@@ -29,7 +29,7 @@ export const categories = [
     "id": "c1",
     "name": {
       "en": "Alertness",
-      "bn": "সতর্কতা"
+      "bn": "সতর্কতা ও মনোযোগ"
     },
     "icon": "Eye"
   },
@@ -37,7 +37,7 @@ export const categories = [
     "id": "c2",
     "name": {
       "en": "Attitude",
-      "bn": "মনোভাব"
+      "bn": "আচরণ ও মনোভাব"
     },
     "icon": "Brain"
   },
@@ -45,7 +45,7 @@ export const categories = [
     "id": "c3",
     "name": {
       "en": "Safety and your vehicle",
-      "bn": "নিরাপত্তা এবং আপনার যান"
+      "bn": "নিরাপত্তা ও আপনার যানবাহন"
     },
     "icon": "ShieldCheck"
   },
@@ -53,7 +53,7 @@ export const categories = [
     "id": "c4",
     "name": {
       "en": "Safety margins",
-      "bn": "নিরাপত্তা মার্জিন"
+      "bn": "নিরাপদ দূরত্ব ও সীমা"
     },
     "icon": "Ruler"
   },
@@ -69,7 +69,7 @@ export const categories = [
     "id": "c6",
     "name": {
       "en": "Vulnerable road users",
-      "bn": "ঝুঁকিপূর্ণ রাস্তা ব্যবহারকারী"
+      "bn": "অরক্ষিত রাস্তা ব্যবহারকারী"
     },
     "icon": "Users"
   },
@@ -77,7 +77,7 @@ export const categories = [
     "id": "c7",
     "name": {
       "en": "Other types of vehicle",
-      "bn": "অন্যান্য ধরণের যান"
+      "bn": "অন্যান্য ধরণের যানবাহন"
     },
     "icon": "Truck"
   },
@@ -85,7 +85,7 @@ export const categories = [
     "id": "c8",
     "name": {
       "en": "Road conditions and vehicle handling",
-      "bn": "রাস্তার অবস্থা এবং যান পরিচালনা"
+      "bn": "রাস্তার অবস্থা ও যানবাহন নিয়ন্ত্রণ"
     },
     "icon": "CloudRain"
   },
@@ -93,7 +93,7 @@ export const categories = [
     "id": "c9",
     "name": {
       "en": "Motorway rules",
-      "bn": "মোটরওয়ে নিয়ম"
+      "bn": "মোটরওয়ে নিয়মাবলী"
     },
     "icon": "Milestone"
   },
@@ -101,7 +101,7 @@ export const categories = [
     "id": "c10",
     "name": {
       "en": "Rules of the road",
-      "bn": "রাস্তার নিয়ম"
+      "bn": "রাস্তার নিয়মাবলী"
     },
     "icon": "BookOpen"
   },
@@ -109,7 +109,7 @@ export const categories = [
     "id": "c11",
     "name": {
       "en": "Road and traffic signs",
-      "bn": "রাস্তা এবং ট্রাফিক চিহ্ন"
+      "bn": "রাস্তা ও ট্রাফিক চিহ্ন"
     },
     "icon": "Signpost"
   },
@@ -117,7 +117,7 @@ export const categories = [
     "id": "c12",
     "name": {
       "en": "Documents",
-      "bn": "নথিপত্র"
+      "bn": "প্রয়োজনীয় নথিপত্র"
     },
     "icon": "FileText"
   },
@@ -125,7 +125,7 @@ export const categories = [
     "id": "c13",
     "name": {
       "en": "Incidents, accidents and emergencies",
-      "bn": "ঘটনা, দুর্ঘটনা এবং জরুরি অবস্থা"
+      "bn": "দুর্ঘটনা ও জরুরি অবস্থা"
     },
     "icon": "Ambulance"
   },
@@ -133,7 +133,7 @@ export const categories = [
     "id": "c14",
     "name": {
       "en": "Vehicle loading",
-      "bn": "যানবাহন লোডিং"
+      "bn": "যানবাহন লোডিং ও মালামাল"
     },
     "icon": "Package"
   }
@@ -188,7 +188,7 @@ export const questions: Question[] = [
     "categoryId": "c10",
     "text": {
       "en": "You may remove your seat belt temporarily when carrying out a manoeuvre that involves:",
-      "bn": "আপনি সাময়িকভাবে আপনার সিট বেল্ট খুলতে পারেন যখন আপনি এমন একটি কৌশল সম্পাদন করছেন যাতে জড়িত:"
+      "bn": "আপনি সাময়িকভাবে আপনার সিট বেল্ট খুলতে পারেন যখন আপনি এমন একটি কৌশল (manoeuvre) সম্পাদন করছেন যাতে জড়িত:"
     },
     "options": [
       {
@@ -231,7 +231,7 @@ export const questions: Question[] = [
     "categoryId": "c6",
     "text": {
       "en": "Your car hits a pedestrian at 60 kph. The pedestrian will:",
-      "bn": "আপনার গাড়ি ৬০ কিমি/ঘন্টা বেগে একজন পথচারীকে আঘাত করলে। পথচারী:"
+      "bn": "যদি আপনার গাড়ি ৬০ কিমি/ঘন্টা বেগে একজন পথচারীকে আঘাত করে, তবে সেই পথচারী:"
     },
     "options": [
       {
@@ -360,7 +360,7 @@ export const questions: Question[] = [
     "categoryId": "c5",
     "text": {
       "en": "You are turning left into a side road. What hazards should you be especially aware of?",
-      "bn": "আপনি একটি পার্শ্ব রাস্তায় বাম দিকে মোড় নিচ্ছেন। কোন বিপদগুলোর বিষয়ে আপনার বিশেষভাবে সচেতন হওয়া উচিত?"
+      "bn": "আপনি একটি পার্শ্ব রাস্তায় বাম দিকে মোড় নিচ্ছেন। কোন বিপদগুলোর (hazards) বিষয়ে আপনার বিশেষভাবে সচেতন হওয়া উচিত?"
     },
     "options": [
       {
@@ -403,7 +403,7 @@ export const questions: Question[] = [
     "categoryId": "c3",
     "text": {
       "en": "The fluid level in your battery is low. What should you top it up with?",
-      "bn": "আপনার ব্যাটারির তরল স্তর কম। এটি কী দিয়ে পূর্ণ করা উচিত?"
+      "bn": "আপনার ব্যাটারির ফ্লুইড বা তরলের মাত্রা কম। এটি কী দিয়ে পূর্ণ করা উচিত?"
     },
     "options": [
       {
@@ -533,7 +533,7 @@ export const questions: Question[] = [
     "categoryId": "c12",
     "text": {
       "en": "The national speed limit for cars and motorcycles on a single carriageway road is",
-      "bn": "সিঙ্গেল ক্যারিজওয়ে রাস্তায় কার এবং মোটরসাইকেলের জন্য জাতীয় গতির সীমা হলো"
+      "bn": "সিঙ্গেল ক্যারিজওয়ে (single carriageway) রাস্তায় কার এবং মোটরসাইকেলের জন্য জাতীয় গতির সীমা হলো"
     },
     "options": [
       {
@@ -706,7 +706,7 @@ export const questions: Question[] = [
     "categoryId": "c6",
     "text": {
       "en": "You have stopped at a pedestrian (zebra) crossing to allow pedestrians to cross. You should:",
-      "bn": "আপনি পথচারীদের পার হওয়ার সুযোগ দিতে একটি জেব্রা ক্রসিংয়ে থেমেছেন। আপনার উচিত:"
+      "bn": "আপনি পথচারীদের পার হওয়ার সুযোগ দিতে একটি জেব্রা ক্রসিংয়ে (zebra crossing) থেমেছেন। আপনার উচিত:"
     },
     "options": [
       {
@@ -1002,42 +1002,42 @@ export const questions: Question[] = [
     "categoryId": "c10",
     "text": {
       "en": "As a driver, how can you help the environment?",
-      "bn": "As a driver, how can you help the environment?"
+      "bn": "একজন চালক হিসেবে আপনি কীভাবে পরিবেশ রক্ষায় সাহায্য করতে পারেন?"
     },
     "options": [
       {
         "id": "a",
         "text": {
           "en": "By driving faster",
-          "bn": "By driving faster"
+          "bn": "দ্রুত গাড়ি চালিয়ে"
         }
       },
       {
         "id": "b",
         "text": {
           "en": "By using leaded fuel",
-          "bn": "By using leaded fuel"
+          "bn": "সীসাযুক্ত জ্বালানি ব্যবহার করে"
         }
       },
       {
         "id": "c",
         "text": {
           "en": "By driving with your windows down",
-          "bn": "By driving with your windows down"
+          "bn": "গাড়ির জানালা খোলা রেখে গাড়ি চালিয়ে"
         }
       },
       {
         "id": "d",
         "text": {
           "en": "By reducing your speed",
-          "bn": "By reducing your speed"
+          "bn": "গাড়ির গতি কমিয়ে"
         }
       }
     ],
     "correctOptionId": "d",
     "explanation": {
       "en": "No explanation available.",
-      "bn": "No explanation available."
+      "bn": "কোনো ব্যাখ্যা নেই।"
     }
   },
   {
@@ -1045,42 +1045,42 @@ export const questions: Question[] = [
     "categoryId": "c8",
     "text": {
       "en": "Whilst driving, the fog clears and you can see more clearly. You must remember to",
-      "bn": "Whilst driving, the fog clears and you can see more clearly. You must remember to"
+      "bn": "গাড়ি চালানোর সময় কুয়াশা কেটে গেলে এবং আপনি পরিষ্কারভাবে দেখতে পেলে, আপনাকে যা মনে রাখতে হবে:"
     },
     "options": [
       {
         "id": "a",
         "text": {
           "en": "Switch off the demister",
-          "bn": "Switch off the demister"
+          "bn": "ডিমিস্টার (demister) বন্ধ করা"
         }
       },
       {
         "id": "b",
         "text": {
           "en": "Reduce your speed",
-          "bn": "Reduce your speed"
+          "bn": "গতি কমানো"
         }
       },
       {
         "id": "c",
         "text": {
           "en": "Switch off the fog lights",
-          "bn": "Switch off the fog lights"
+          "bn": "ফগ লাইট (fog lights) বন্ধ করা"
         }
       },
       {
         "id": "d",
         "text": {
           "en": "Close any open windows",
-          "bn": "Close any open windows"
+          "bn": "খোলা জানালা বন্ধ করা"
         }
       }
     ],
     "correctOptionId": "c",
     "explanation": {
       "en": "No explanation available.",
-      "bn": "No explanation available."
+      "bn": "কোনো ব্যাখ্যা নেই।"
     }
   },
   {
@@ -1088,42 +1088,42 @@ export const questions: Question[] = [
     "categoryId": "c14",
     "text": {
       "en": "Overloading your vehicle can seriously affect?",
-      "bn": "Overloading your vehicle can seriously affect?"
+      "bn": "আপনার যানবাহনে অতিরিক্ত মালামাল বোঝাই (overloading) করলে তা মারাত্মকভাবে প্রভাবিত করতে পারে:"
     },
     "options": [
       {
         "id": "a",
         "text": {
           "en": "The Handling",
-          "bn": "The Handling"
+          "bn": "যানবাহন নিয়ন্ত্রণ (Handling)"
         }
       },
       {
         "id": "b",
         "text": {
           "en": "The steering",
-          "bn": "The steering"
+          "bn": "স্টিয়ারিং (Steering)"
         }
       },
       {
         "id": "c",
         "text": {
           "en": "Your comfort",
-          "bn": "Your comfort"
+          "bn": "আপনার আরাম"
         }
       },
       {
         "id": "d",
         "text": {
           "en": "Your ability to change gears",
-          "bn": "Your ability to change gears"
+          "bn": "গিয়ার পরিবর্তনের ক্ষমতা"
         }
       }
     ],
     "correctOptionId": "b",
     "explanation": {
       "en": "No explanation available.",
-      "bn": "No explanation available."
+      "bn": "কোনো ব্যাখ্যা নেই।"
     }
   },
   {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
@@ -9,7 +9,15 @@ import { Auth } from './pages/Auth';
 import { useStore } from './store/useStore';
 
 export default function App() {
-  const user = useStore((state) => state.user);
+  const { user, theme } = useStore();
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
   if (!user) {
     return <Auth />;

@@ -65,6 +65,18 @@ export const MockTest: React.FC = () => {
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
+  const currentQ = testQuestions[currentIndex];
+  const nextQ = testQuestions[currentIndex + 1];
+
+  useEffect(() => {
+    if (nextQ && language === 'bn' && nextQ.text.bn === nextQ.text.en) {
+      // Pre-translate the next question in the background
+      import('../services/translationService').then(({ translationService }) => {
+        translationService.translateQuestion(nextQ).catch(console.error);
+      });
+    }
+  }, [currentIndex, language, nextQ]);
+
   if (testState === 'intro') {
     return (
       <div className="space-y-8 font-bengali text-center py-8 animate-in fade-in">
@@ -76,18 +88,18 @@ export const MockTest: React.FC = () => {
           {language === 'bn' ? 'মক টেস্ট' : 'Mock Test'}
         </h2>
         <div className="space-y-4 text-muted-foreground max-w-sm mx-auto text-left bg-card p-8 rounded-3xl border border-border shadow-sm">
-          <p className="flex items-center gap-3 font-medium">
+          <div className="flex items-center gap-3 font-medium">
             <div className="bg-green-100 dark:bg-green-500/20 p-2 rounded-lg text-green-600 dark:text-green-400"><CheckCircle2 size={20} /></div>
             {language === 'bn' ? '৫০টি বহুনির্বাচনী প্রশ্ন' : '50 multiple choice questions'}
-          </p>
-          <p className="flex items-center gap-3 font-medium">
+          </div>
+          <div className="flex items-center gap-3 font-medium">
             <div className="bg-blue-100 dark:bg-blue-500/20 p-2 rounded-lg text-blue-600 dark:text-blue-400"><Timer size={20} /></div>
             {language === 'bn' ? 'সময়: ৫৭ মিনিট' : 'Time: 57 minutes'}
-          </p>
-          <p className="flex items-center gap-3 font-medium">
+          </div>
+          <div className="flex items-center gap-3 font-medium">
             <div className="bg-orange-100 dark:bg-orange-500/20 p-2 rounded-lg text-orange-600 dark:text-orange-400"><AlertCircle size={20} /></div>
             {language === 'bn' ? 'পাস মার্ক: ৪৩/৫০' : 'Pass mark: 43/50'}
-          </p>
+          </div>
         </div>
         <button
           onClick={startTest}
@@ -140,8 +152,6 @@ export const MockTest: React.FC = () => {
       </div>
     );
   }
-
-  const currentQ = testQuestions[currentIndex];
 
   return (
     <div className="space-y-6 font-bengali pb-8">
