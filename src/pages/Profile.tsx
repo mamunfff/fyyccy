@@ -77,43 +77,6 @@ export const Profile: React.FC = () => {
         </div>
       </div>
 
-      <div className="space-y-4">
-        <h3 className="text-xl font-bold flex items-center gap-2 tracking-tight">
-          <ShoppingBag className="text-primary" />
-          {t.purchases[language]}
-        </h3>
-        <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
-          {purchases.length > 0 ? (
-            <div className="divide-y divide-border">
-              {purchases.map((purchase) => (
-                <div key={purchase.id} className="p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      <CreditCard size={20} />
-                    </div>
-                    <div>
-                      <div className="font-bold text-foreground">{purchase.item}</div>
-                      <div className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Calendar size={12} />
-                        {new Date(purchase.date).toLocaleDateString(language === 'bn' ? 'bn-BD' : 'en-GB')}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-lg font-black text-primary">
-                    £{purchase.amount.toFixed(2)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="p-12 text-center text-muted-foreground flex flex-col items-center gap-2">
-              <ShoppingBag size={48} className="opacity-20" />
-              <p className="font-medium">{t.noPurchases[language]}</p>
-            </div>
-          )}
-        </div>
-      </div>
-
       <div className="pt-4">
         <button
           onClick={handleLogout}

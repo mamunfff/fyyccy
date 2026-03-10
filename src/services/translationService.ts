@@ -1,14 +1,24 @@
 import { GoogleGenAI, Type, ThinkingLevel } from "@google/genai";
 import { Question } from "../data/questions";
 
-// Initialize Gemini API
-// The API key is handled by the platform and available in process.env.GEMINI_API_KEY
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+let genAI: GoogleGenAI | null = null;
+
+function getGenAI() {
+  if (!genAI) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.error("GEMINI_API_KEY is missing. Translation will not work. If you have deployed this app, make sure to set the GEMINI_API_KEY environment variable.");
+      return null;
+    }
+    genAI = new GoogleGenAI({ apiKey });
+  }
+  return genAI;
+}
 
 const translationCache: Record<string, Question> = {};
 
 export const translationService = {
-  async translateQuestion(question: Question): Promise<Question> {
+  async translateQuestion(question: Question, retryCount = 0): Promise<Question> {
     // Check cache first
     if (translationCache[question.id]) {
       return translationCache[question.id];
@@ -19,9 +29,12 @@ export const translationService = {
       return question;
     }
 
+    const ai = getGenAI();
+    if (!ai) return question;
+
     try {
       const model = "gemini-3-flash-preview";
-      const response = await genAI.models.generateContent({
+      const response = await ai.models.generateContent({
         model,
         contents: `Translate the following UK Driving Theory Test content into clear, accurate, and natural Bengali.
 
@@ -33,7 +46,7 @@ export const translationService = {
         ${question.options.map(o => `${o.id}: ${o.text.en}`).join('\n')}
         Explanation: ${question.explanation.en}`,
         config: {
-          systemInstruction: "You are an expert translator specializing in the UK Highway Code and Driving Theory Test. Your goal is to translate English driving questions into Bengali that is technically accurate, easy to understand for learners, and culturally appropriate for the UK Bengali-speaking community. Avoid literal translations that lose meaning. Ensure driving-specific terms are translated correctly according to standard UK driving terminology.",
+          systemInstruction: "You are an expert translator specializing in the UK Highway Code and Driving Theory Test. Your goal is to translate English driving questions into Bengali that is technically accurate, easy to understand for learners, and culturally appropriate for the UK Bengali-speaking community. Avoid literal translations that lose meaning. Ensure driving-specific terms are translated correctly according to standard UK driving terminology. ALWAYS return a valid JSON object matching the schema.",
           thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
           responseMimeType: "application/json",
           responseSchema: {
@@ -57,9 +70,14 @@ export const translationService = {
         }
       });
 
-      const result = JSON.parse(response.text || "{}");
+      const text = response.text?.trim();
+      if (!text) throw new Error("Empty response from Gemini");
+
+      // Handle potential markdown code blocks in response
+      const jsonStr = text.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+      const result = JSON.parse(jsonStr);
       
-      if (!result.text) return question;
+      if (!result.text) throw new Error("Invalid translation result");
 
       const translatedQuestion = {
         ...question,
@@ -76,7 +94,14 @@ export const translationService = {
       
       return translatedQuestion;
     } catch (error) {
-      console.error("Translation error:", error);
+      console.error(`Translation error (attempt ${retryCount + 1}):`, error);
+      
+      if (retryCount < 2) {
+        // Wait before retrying (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+        return this.translateQuestion(question, retryCount + 1);
+      }
+      
       return question;
     }
   }

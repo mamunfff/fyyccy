@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useStore, PracticeSettings } from '../store/useStore';
 import { questions, categories } from '../data/questions';
 import { QuestionCard } from '../components/QuestionCard';
-import { ChevronLeft, ChevronRight, ListFilter, LayoutGrid, Settings, Check, AlertCircle, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ListFilter, LayoutGrid, Settings, Check, AlertCircle, Zap, Award, RotateCcw } from 'lucide-react';
 import { cn } from '../components/BottomNav';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,6 +15,8 @@ export const Practice: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [answers, setAnswers] = useState<Record<string, boolean>>({});
 
   const filteredQuestions = useMemo(() => {
     let qs = selectedCategory === 'all'
@@ -27,9 +29,6 @@ export const Practice: React.FC = () => {
       qs = qs.filter(q => !answeredQuestions.includes(q.id));
     }
 
-    // Shuffle for variety if it's a limited test? 
-    // Or just slice. The user didn't ask for shuffle.
-    
     if (practiceSettings.maxQuestions !== 'all' && qs.length > Number(practiceSettings.maxQuestions)) {
       qs = qs.slice(0, Number(practiceSettings.maxQuestions));
     }
@@ -52,6 +51,8 @@ export const Practice: React.FC = () => {
   const handleNext = () => {
     if (currentIndex < filteredQuestions.length - 1) {
       setCurrentIndex(prev => prev + 1);
+    } else {
+      setShowResults(true);
     }
   };
 
@@ -62,17 +63,89 @@ export const Practice: React.FC = () => {
   };
 
   const handleAnswer = (isCorrect: boolean) => {
+    if (!currentQuestion) return;
+    setAnswers(prev => ({ ...prev, [currentQuestion.id]: isCorrect }));
+
     if (!isCorrect && practiceSettings.alertIncorrect) {
-      // Simple alert for now, could be a toast
       alert(language === 'bn' ? 'ভুল উত্তর! সঠিক উত্তরটি দেখুন।' : 'Incorrect answer! Check the correct one.');
     }
 
     if (isCorrect && practiceSettings.autoNext) {
       setTimeout(() => {
         handleNext();
-      }, 1500); // Small delay to show correct state
+      }, 1500);
     }
   };
+
+  const resetSession = () => {
+    setSelectedCategory(null);
+    setCurrentIndex(0);
+    setShowResults(false);
+    setAnswers({});
+  };
+
+  if (showResults) {
+    const correctCount = Object.values(answers).filter(v => v).length;
+    const incorrectCount = Object.values(answers).filter(v => !v).length;
+
+    return (
+      <div className="space-y-8 font-bengali pb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="bg-gradient-to-br from-primary to-indigo-600 p-8 rounded-[2rem] text-white shadow-xl shadow-primary/20 relative overflow-hidden flex flex-col items-center text-center">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+          <div className="relative z-10 w-20 h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mb-4 border-4 border-white/30 shadow-lg">
+            <Award size={40} className="text-white" />
+          </div>
+          <h2 className="text-3xl font-black uppercase tracking-tight mb-2">
+            {language === 'bn' ? 'অনুশীলন সম্পন্ন' : 'PRACTICE COMPLETE'}
+          </h2>
+          <p className="text-primary-foreground/80 font-medium">
+            {language === 'bn' ? 'আপনি আপনার প্র্যাকটিস সেশন শেষ করেছেন।' : 'You have finished your practice session.'}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-card p-6 rounded-3xl border border-border shadow-sm flex flex-col items-center justify-center group">
+            <div className="text-4xl font-black text-green-500 tracking-tighter">{correctCount}</div>
+            <div className="text-sm font-bold text-muted-foreground mt-1 uppercase tracking-widest">
+              {language === 'bn' ? 'সঠিক' : 'CORRECT'}
+            </div>
+          </div>
+          <div className="bg-card p-6 rounded-3xl border border-border shadow-sm flex flex-col items-center justify-center group">
+            <div className="text-4xl font-black text-destructive tracking-tighter">{incorrectCount}</div>
+            <div className="text-sm font-bold text-muted-foreground mt-1 uppercase tracking-widest">
+              {language === 'bn' ? 'ভুল' : 'INCORRECT'}
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-xl font-bold flex items-center gap-2 tracking-tight">
+            <AlertCircle className="text-primary" />
+            {language === 'bn' ? 'ভুল উত্তরগুলো রিভিউ করুন' : 'Review Incorrect Answers'}
+          </h3>
+          
+          <div className="space-y-4">
+            {filteredQuestions.filter(q => answers[q.id] === false).map((q) => (
+              <QuestionCard key={q.id} question={q} isReviewMode={true} />
+            ))}
+            {incorrectCount === 0 && (
+              <div className="p-8 text-center bg-muted/30 rounded-3xl border border-dashed border-border text-muted-foreground">
+                {language === 'bn' ? 'কোনো ভুল উত্তর নেই! দারুণ কাজ করেছেন।' : 'No incorrect answers! Great job.'}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <button
+          onClick={resetSession}
+          className="w-full py-5 rounded-3xl bg-primary text-primary-foreground font-black text-lg uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/20 active:scale-[0.98] flex items-center justify-center gap-3"
+        >
+          <RotateCcw size={24} />
+          {language === 'bn' ? 'আবার শুরু করুন' : 'START OVER'}
+        </button>
+      </div>
+    );
+  }
 
   if (!selectedCategory) {
     return (
@@ -229,11 +302,13 @@ export const Practice: React.FC = () => {
     ? (language === 'bn' ? 'সব প্রশ্ন' : 'All Questions')
     : categories.find(c => c.id === selectedCategory)?.name[language];
 
+  const isLastQuestion = currentIndex === filteredQuestions.length - 1;
+
   return (
     <div className="space-y-6 font-bengali pb-8">
       <div className="flex items-center justify-between">
         <button 
-          onClick={() => setSelectedCategory(null)}
+          onClick={resetSession}
           className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-1 bg-muted/50 px-3 py-1.5 rounded-full transition-colors"
         >
           <ChevronLeft size={16} />
@@ -278,10 +353,12 @@ export const Practice: React.FC = () => {
         </button>
         <button
           onClick={handleNext}
-          disabled={currentIndex === filteredQuestions.length - 1}
-          className="flex-1 py-4 rounded-2xl bg-primary text-primary-foreground font-bold disabled:opacity-50 flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+          className="flex-1 py-4 rounded-2xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
         >
-          {language === 'bn' ? 'পরবর্তী' : 'Next'}
+          {isLastQuestion 
+            ? (language === 'bn' ? 'ফলাফল দেখুন' : 'View Results')
+            : (language === 'bn' ? 'পরবর্তী' : 'Next')
+          }
           <ChevronRight size={20} />
         </button>
       </div>
