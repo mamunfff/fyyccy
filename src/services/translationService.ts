@@ -15,7 +15,27 @@ function getGenAI() {
   return genAI;
 }
 
-const translationCache: Record<string, Question> = {};
+const CACHE_KEY = 'driving_theory_translations';
+
+const getInitialCache = (): Record<string, Question> => {
+  try {
+    const saved = localStorage.getItem(CACHE_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch (e) {
+    console.error("Failed to load translation cache:", e);
+    return {};
+  }
+};
+
+const translationCache: Record<string, Question> = getInitialCache();
+
+const saveCache = () => {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(translationCache));
+  } catch (e) {
+    console.error("Failed to save translation cache:", e);
+  }
+};
 
 export const translationService = {
   async translateQuestion(question: Question, retryCount = 0): Promise<Question> {
@@ -24,8 +44,8 @@ export const translationService = {
       return translationCache[question.id];
     }
 
-    // If it's already translated (not fallback English), return it
-    if (question.text.bn !== question.text.en) {
+    // If it's already translated in the static data (not fallback English), return it
+    if (question.text.bn && question.text.bn !== question.text.en) {
       return question;
     }
 
@@ -89,8 +109,9 @@ export const translationService = {
         explanation: { ...question.explanation, bn: result.explanation }
       };
 
-      // Store in cache
+      // Store in cache and persist
       translationCache[question.id] = translatedQuestion;
+      saveCache();
       
       return translatedQuestion;
     } catch (error) {

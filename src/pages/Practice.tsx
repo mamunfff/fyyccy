@@ -17,6 +17,8 @@ export const Practice: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
+  const [isCaching, setIsCaching] = useState(false);
+  const [cacheProgress, setCacheProgress] = useState(0);
 
   const filteredQuestions = useMemo(() => {
     let qs = selectedCategory === 'all'
@@ -82,6 +84,35 @@ export const Practice: React.FC = () => {
     setCurrentIndex(0);
     setShowResults(false);
     setAnswers({});
+    setIsCaching(false);
+    setCacheProgress(0);
+  };
+
+  const handlePreCache = async () => {
+    if (!selectedCategory) return;
+    setIsCaching(true);
+    setCacheProgress(0);
+
+    const { translationService } = await import('../services/translationService');
+    const total = filteredQuestions.length;
+    
+    for (let i = 0; i < filteredQuestions.length; i++) {
+      const q = filteredQuestions[i];
+      if (q.text.bn === q.text.en) {
+        await translationService.translateQuestion(q);
+      }
+      setCacheProgress(Math.round(((i + 1) / total) * 100));
+    }
+    
+    setIsCaching(false);
+    alert(language === 'bn' ? 'সব অনুবাদ সম্পন্ন হয়েছে!' : 'All translations complete!');
+  };
+
+  const handleClearCache = () => {
+    if (confirm(language === 'bn' ? 'আপনি কি সব সেভ করা অনুবাদ মুছে ফেলতে চান?' : 'Are you sure you want to clear all saved translations?')) {
+      localStorage.removeItem('driving_theory_translations');
+      window.location.reload();
+    }
   };
 
   if (showResults) {
@@ -319,9 +350,63 @@ export const Practice: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-gradient-to-r from-accent to-transparent p-4 rounded-2xl border border-accent flex justify-between items-center">
-        <h3 className="font-bold text-foreground line-clamp-1 mr-4">{categoryName}</h3>
-      </div>
+        <div className="bg-gradient-to-r from-accent to-transparent p-4 rounded-2xl border border-accent flex justify-between items-center">
+          <h3 className="font-bold text-foreground line-clamp-1 mr-4">{categoryName}</h3>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => setShowSettings(!showSettings)}
+              className={cn(
+                "p-2 rounded-xl transition-all",
+                showSettings ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-accent"
+              )}
+            >
+              <Settings size={18} />
+            </button>
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {showSettings && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="bg-card border border-border rounded-3xl p-6 mb-2 space-y-4 shadow-sm">
+                <div className="grid gap-3">
+                  <button
+                    onClick={handlePreCache}
+                    disabled={isCaching}
+                    className="flex items-center justify-between p-4 rounded-2xl bg-primary/10 hover:bg-primary/20 transition-colors disabled:opacity-50"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Zap size={18} className="text-primary" />
+                      <span className="font-bold text-sm">
+                        {isCaching 
+                          ? (language === 'bn' ? `অনুবাদ হচ্ছে... ${cacheProgress}%` : `Caching... ${cacheProgress}%`)
+                          : (language === 'bn' ? 'সব অনুবাদ সেভ করুন (অফলাইন)' : 'Pre-cache all (Offline)')
+                        }
+                      </span>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={handleClearCache}
+                    className="flex items-center justify-between p-4 rounded-2xl bg-destructive/10 hover:bg-destructive/20 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <RotateCcw size={18} className="text-destructive" />
+                      <span className="font-bold text-sm text-destructive">
+                        {language === 'bn' ? 'ক্যাশ মুছে ফেলুন' : 'Clear Cache'}
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       {currentQuestion ? (
         <motion.div
