@@ -13,7 +13,13 @@ export const Header: React.FC = () => {
             <Car size={20} />
           </div>
           <h1 className="text-sm font-black uppercase tracking-[0.2em] text-foreground">
-            {language === 'bn' ? 'ইউকে থিওরি টেস্ট' : 'UK THEORY'}
+            {language === 'bn' ? 'ইউকে থিওরি টেস্ট' : 
+             language === 'bilingual' ? (
+               <span className="flex flex-col leading-none">
+                 <span className="text-[10px]">UK THEORY</span>
+                 <span className="text-[8px] font-bengali normal-case tracking-normal">ইউকে থিওরি</span>
+               </span>
+             ) : 'UK THEORY'}
           </h1>
         </div>
         <div className="flex items-center gap-1.5">
@@ -22,7 +28,7 @@ export const Header: React.FC = () => {
             className="h-8 px-2.5 flex items-center justify-center rounded-lg bg-muted hover:bg-accent transition-colors font-bold text-[10px] tracking-widest uppercase" 
             aria-label="Toggle Language"
           >
-            {language === 'bn' ? 'বাংলা' : 'ENG'}
+            {language === 'bn' ? 'বাংলা' : language === 'bilingual' ? 'BOTH' : 'ENG'}
           </button>
           <button 
             onClick={toggleTheme} 

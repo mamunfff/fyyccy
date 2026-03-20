@@ -25,12 +25,16 @@ export const Auth: React.FC = () => {
           // Login
           const userData = await firebaseService.getUser(email);
           if (!userData) {
-            setError(language === 'bn' ? 'অ্যাকাউন্ট পাওয়া যায়নি' : 'Account not found');
+            setError(language === 'bn' ? 'অ্যাকাউন্ট পাওয়া যায়নি' : 
+                   language === 'bilingual' ? 'Account not found / অ্যাকাউন্ট পাওয়া যায়নি' :
+                   'Account not found');
             setLoading(false);
             return;
           }
           if (userData.password !== password) {
-            setError(language === 'bn' ? 'ভুল পাসওয়ার্ড' : 'Incorrect password');
+            setError(language === 'bn' ? 'ভুল পাসওয়ার্ড' : 
+                   language === 'bilingual' ? 'Incorrect password / ভুল পাসওয়ার্ড' :
+                   'Incorrect password');
             setLoading(false);
             return;
           }
@@ -54,7 +58,9 @@ export const Auth: React.FC = () => {
           // Signup
           const existingUser = await firebaseService.getUser(email);
           if (existingUser) {
-            setError(language === 'bn' ? 'এই ইমেইল দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট আছে' : 'Account already exists with this email');
+            setError(language === 'bn' ? 'এই ইমেইল দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট আছে' : 
+                   language === 'bilingual' ? 'Account already exists with this email / এই ইমেইল দিয়ে ইতিমধ্যে একটি অ্যাকাউন্ট আছে' :
+                   'Account already exists with this email');
             setLoading(false);
             return;
           }
@@ -76,7 +82,9 @@ export const Auth: React.FC = () => {
         }
       } catch (err) {
         console.error('Auth error:', err);
-        setError(language === 'bn' ? 'একটি ত্রুটি ঘটেছে. আবার চেষ্টা করুন.' : 'An error occurred. Please try again.');
+        setError(language === 'bn' ? 'একটি ত্রুটি ঘটেছে. আবার চেষ্টা করুন.' : 
+               language === 'bilingual' ? 'An error occurred. Please try again. / একটি ত্রুটি ঘটেছে. আবার চেষ্টা করুন.' :
+               'An error occurred. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -117,12 +125,25 @@ export const Auth: React.FC = () => {
     backToLogin: { en: 'Back to Login', bn: 'লগইনে ফিরে যান' }
   };
 
+  const renderT = (key: keyof typeof t, isSmall = false) => {
+    const item = t[key];
+    if (language === 'bilingual') {
+      return (
+        <span className="flex flex-col">
+          <span>{item.en}</span>
+          <span className={isSmall ? "text-[10px] opacity-70 font-normal" : "text-[0.8em] opacity-70 font-normal"}>{item.bn}</span>
+        </span>
+      );
+    }
+    return item[language as 'en' | 'bn'] || item.en;
+  };
+
   if (showPending) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6 font-bengali bg-background text-foreground relative overflow-hidden">
         <div className="absolute top-6 right-6 flex items-center gap-2">
           <button onClick={toggleLanguage} className="h-8 px-3 flex items-center justify-center rounded-lg bg-muted hover:bg-accent transition-colors font-bold text-[10px] tracking-widest uppercase">
-            {language === 'bn' ? 'বাংলা' : 'ENG'}
+            {language === 'bn' ? 'বাংলা' : language === 'bilingual' ? 'BOTH' : 'ENG'}
           </button>
           <button 
             onClick={toggleTheme} 
@@ -141,12 +162,12 @@ export const Auth: React.FC = () => {
             <Loader2 size={48} className="animate-spin" />
           </div>
           <div className="space-y-2">
-            <h1 className="text-3xl font-black tracking-tight uppercase">{t.pendingTitle[language]}</h1>
-            <p className="text-muted-foreground font-medium">{t.pendingSubtitle[language]}</p>
+            <h1 className="text-3xl font-black tracking-tight uppercase">{renderT('pendingTitle')}</h1>
+            <p className="text-muted-foreground font-medium">{renderT('pendingSubtitle')}</p>
           </div>
           
           <div className="p-6 bg-card border border-border rounded-2xl space-y-4">
-            <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">{t.contactWhatsApp[language]}</p>
+            <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground">{renderT('contactWhatsApp')}</p>
             <a 
               href="https://wa.me/447555346617" 
               target="_blank" 
@@ -162,7 +183,7 @@ export const Auth: React.FC = () => {
             onClick={() => setShowPending(false)}
             className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
           >
-            {t.backToLogin[language]}
+            {renderT('backToLogin')}
           </button>
         </motion.div>
       </div>
@@ -174,7 +195,7 @@ export const Auth: React.FC = () => {
       <div className="min-h-screen flex flex-col items-center justify-center p-6 font-bengali bg-background text-foreground relative overflow-hidden">
         <div className="absolute top-6 right-6 flex items-center gap-2">
           <button onClick={toggleLanguage} className="h-8 px-3 flex items-center justify-center rounded-lg bg-muted hover:bg-accent transition-colors font-bold text-[10px] tracking-widest uppercase">
-            {language === 'bn' ? 'বাংলা' : 'ENG'}
+            {language === 'bn' ? 'বাংলা' : language === 'bilingual' ? 'BOTH' : 'ENG'}
           </button>
           <button 
             onClick={toggleTheme} 
@@ -195,8 +216,8 @@ export const Auth: React.FC = () => {
               <ShoppingBag size={48} />
             </div>
             <div className="space-y-1">
-              <h1 className="text-3xl font-black tracking-tight uppercase">{t.purchaseTitle[language]}</h1>
-              <p className="text-muted-foreground font-medium text-sm">{t.purchaseSubtitle[language]}</p>
+              <h1 className="text-3xl font-black tracking-tight uppercase">{renderT('purchaseTitle')}</h1>
+              <p className="text-muted-foreground font-medium text-sm">{renderT('purchaseSubtitle')}</p>
             </div>
           </div>
 
@@ -207,8 +228,8 @@ export const Auth: React.FC = () => {
             
             <div className="space-y-4">
               <div className="space-y-1">
-                <p className="text-muted-foreground line-through text-lg font-bold">{t.originalPrice[language]}</p>
-                <p className="text-4xl font-black text-primary">{t.offerPrice[language]}</p>
+                <p className="text-muted-foreground line-through text-lg font-bold">{renderT('originalPrice')}</p>
+                <p className="text-4xl font-black text-primary">{renderT('offerPrice')}</p>
               </div>
 
               <div className="space-y-3">
@@ -220,7 +241,14 @@ export const Auth: React.FC = () => {
                 ].map((feature, i) => (
                   <div key={i} className="flex items-center gap-3 text-sm font-medium">
                     <CheckCircle size={18} className="text-green-500 shrink-0" />
-                    <span>{feature[language]}</span>
+                    <span>
+                      {language === 'bilingual' ? (
+                        <span className="flex flex-col">
+                          <span>{feature.en}</span>
+                          <span className="text-[10px] opacity-70 font-normal">{feature.bn}</span>
+                        </span>
+                      ) : feature[language as 'en' | 'bn'] || feature.en}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -231,7 +259,7 @@ export const Auth: React.FC = () => {
               disabled={loading}
               className="w-full py-4 rounded-2xl bg-primary text-primary-foreground font-black text-lg uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/20 active:scale-[0.98] flex items-center justify-center gap-3 disabled:opacity-70"
             >
-              {loading ? <Loader2 size={24} className="animate-spin" /> : <><ShoppingBag size={24} /> {t.purchaseBtn[language]}</>}
+              {loading ? <Loader2 size={24} className="animate-spin" /> : <><ShoppingBag size={24} /> {renderT('purchaseBtn')}</>}
             </button>
           </div>
 
@@ -257,7 +285,7 @@ export const Auth: React.FC = () => {
           className="h-8 px-3 flex items-center justify-center rounded-lg bg-muted hover:bg-accent transition-colors font-bold text-[10px] tracking-widest uppercase" 
           aria-label="Toggle Language"
         >
-          {language === 'bn' ? 'বাংলা' : 'ENG'}
+          {language === 'bn' ? 'বাংলা' : language === 'bilingual' ? 'BOTH' : 'ENG'}
         </button>
         <button 
           onClick={toggleTheme} 
@@ -280,10 +308,10 @@ export const Auth: React.FC = () => {
           </div>
           <div className="space-y-1">
             <h1 className="text-3xl font-black tracking-tight uppercase">
-              {isLogin ? t.loginTitle[language] : t.signupTitle[language]}
+              {isLogin ? renderT('loginTitle') : renderT('signupTitle')}
             </h1>
             <p className="text-muted-foreground font-medium text-sm">
-              {isLogin ? t.subtitle[language] : t.signupSubtitle[language]}
+              {isLogin ? renderT('subtitle') : renderT('signupSubtitle')}
             </p>
           </div>
         </div>
@@ -301,7 +329,7 @@ export const Auth: React.FC = () => {
           
           {!isLogin && (
             <div className="space-y-1.5">
-              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">{t.name[language]}</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">{renderT('name', true)}</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-muted-foreground/50">
                   <UserIcon size={16} />
@@ -319,7 +347,7 @@ export const Auth: React.FC = () => {
           )}
           
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">{t.email[language]}</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">{renderT('email', true)}</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-muted-foreground/50">
                 <Mail size={16} />
@@ -336,7 +364,7 @@ export const Auth: React.FC = () => {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">{t.password[language]}</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">{renderT('password', true)}</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-muted-foreground/50">
                 <Lock size={16} />
@@ -358,12 +386,12 @@ export const Auth: React.FC = () => {
             className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground font-black text-sm uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/10 active:scale-[0.98] mt-4 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading && <Loader2 size={16} className="animate-spin" />}
-            {isLogin ? t.loginBtn[language] : t.signupBtn[language]}
+            {isLogin ? renderT('loginBtn') : renderT('signupBtn')}
           </button>
         </form>
 
         <div className="text-center text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-          {isLogin ? t.noAccount[language] : t.hasAccount[language]}{' '}
+          {isLogin ? renderT('noAccount', true) : renderT('hasAccount', true)}{' '}
           <button 
             onClick={() => {
               setIsLogin(!isLogin);
@@ -371,7 +399,7 @@ export const Auth: React.FC = () => {
             }}
             className="text-primary hover:underline"
           >
-            {isLogin ? t.createOne[language] : t.signInInstead[language]}
+            {isLogin ? renderT('createOne', true) : renderT('signInInstead', true)}
           </button>
         </div>
       </motion.div>

@@ -1,4 +1,4 @@
-export type Language = 'en' | 'bn';
+export type Language = 'en' | 'bn' | 'bilingual';
 
 export interface Option {
   id: string;

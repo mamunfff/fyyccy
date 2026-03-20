@@ -64,12 +64,27 @@ export const Practice: React.FC = () => {
     }
   };
 
+  const renderT = (en: string, bn: string, isSmall = false) => {
+    if (language === 'bilingual') {
+      return (
+        <span className="flex flex-col">
+          <span className={isSmall ? "text-xs" : ""}>{en}</span>
+          <span className={isSmall ? "text-[10px] opacity-70 font-normal" : "text-sm opacity-70 font-normal"}>{bn}</span>
+        </span>
+      );
+    }
+    return language === 'bn' ? bn : en;
+  };
+
   const handleAnswer = (isCorrect: boolean) => {
     if (!currentQuestion) return;
     setAnswers(prev => ({ ...prev, [currentQuestion.id]: isCorrect }));
 
     if (!isCorrect && practiceSettings.alertIncorrect) {
-      alert(language === 'bn' ? 'ভুল উত্তর! সঠিক উত্তরটি দেখুন।' : 'Incorrect answer! Check the correct one.');
+      const msg = language === 'bn' ? 'ভুল উত্তর! সঠিক উত্তরটি দেখুন।' : 
+                 language === 'bilingual' ? 'Incorrect answer! Check the correct one.\nভুল উত্তর! সঠিক উত্তরটি দেখুন।' :
+                 'Incorrect answer! Check the correct one.';
+      alert(msg);
     }
 
     if (isCorrect && practiceSettings.autoNext) {
@@ -105,7 +120,10 @@ export const Practice: React.FC = () => {
     }
     
     setIsCaching(false);
-    alert(language === 'bn' ? 'সব অনুবাদ সম্পন্ন হয়েছে!' : 'All translations complete!');
+    const msg = language === 'bn' ? 'সব অনুবাদ সম্পন্ন হয়েছে!' : 
+               language === 'bilingual' ? 'All translations complete!\nসব অনুবাদ সম্পন্ন হয়েছে!' :
+               'All translations complete!';
+    alert(msg);
   };
 
   const handleClearCache = () => {
@@ -127,10 +145,10 @@ export const Practice: React.FC = () => {
             <Award size={40} className="text-white" />
           </div>
           <h2 className="text-3xl font-black uppercase tracking-tight mb-2">
-            {language === 'bn' ? 'অনুশীলন সম্পন্ন' : 'PRACTICE COMPLETE'}
+            {renderT('PRACTICE COMPLETE', 'অনুশীলন সম্পন্ন')}
           </h2>
           <p className="text-primary-foreground/80 font-medium">
-            {language === 'bn' ? 'আপনি আপনার প্র্যাকটিস সেশন শেষ করেছেন।' : 'You have finished your practice session.'}
+            {renderT('You have finished your practice session.', 'আপনি আপনার প্র্যাকটিস সেশন শেষ করেছেন।')}
           </p>
         </div>
 
@@ -138,13 +156,13 @@ export const Practice: React.FC = () => {
           <div className="bg-card p-6 rounded-3xl border border-border shadow-sm flex flex-col items-center justify-center group">
             <div className="text-4xl font-black text-green-500 tracking-tighter">{correctCount}</div>
             <div className="text-sm font-bold text-muted-foreground mt-1 uppercase tracking-widest">
-              {language === 'bn' ? 'সঠিক' : 'CORRECT'}
+              {renderT('CORRECT', 'সঠিক', true)}
             </div>
           </div>
           <div className="bg-card p-6 rounded-3xl border border-border shadow-sm flex flex-col items-center justify-center group">
             <div className="text-4xl font-black text-destructive tracking-tighter">{incorrectCount}</div>
             <div className="text-sm font-bold text-muted-foreground mt-1 uppercase tracking-widest">
-              {language === 'bn' ? 'ভুল' : 'INCORRECT'}
+              {renderT('INCORRECT', 'ভুল', true)}
             </div>
           </div>
         </div>
@@ -152,7 +170,7 @@ export const Practice: React.FC = () => {
         <div className="space-y-4">
           <h3 className="text-xl font-bold flex items-center gap-2 tracking-tight">
             <AlertCircle className="text-primary" />
-            {language === 'bn' ? 'ভুল উত্তরগুলো রিভিউ করুন' : 'Review Incorrect Answers'}
+            {renderT('Review Incorrect Answers', 'ভুল উত্তরগুলো রিভিউ করুন')}
           </h3>
           
           <div className="space-y-4">
@@ -161,7 +179,7 @@ export const Practice: React.FC = () => {
             ))}
             {incorrectCount === 0 && (
               <div className="p-8 text-center bg-muted/30 rounded-3xl border border-dashed border-border text-muted-foreground">
-                {language === 'bn' ? 'কোনো ভুল উত্তর নেই! দারুণ কাজ করেছেন।' : 'No incorrect answers! Great job.'}
+                {renderT('No incorrect answers! Great job.', 'কোনো ভুল উত্তর নেই! দারুণ কাজ করেছেন।')}
               </div>
             )}
           </div>
@@ -172,7 +190,7 @@ export const Practice: React.FC = () => {
           className="w-full py-5 rounded-3xl bg-primary text-primary-foreground font-black text-lg uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-primary/20 active:scale-[0.98] flex items-center justify-center gap-3"
         >
           <RotateCcw size={24} />
-          {language === 'bn' ? 'আবার শুরু করুন' : 'START OVER'}
+          {renderT('START OVER', 'আবার শুরু করুন')}
         </button>
       </div>
     );
@@ -187,7 +205,7 @@ export const Practice: React.FC = () => {
               <LayoutGrid className="text-primary" size={24} />
             </div>
             <h2 className="text-2xl font-black uppercase tracking-tight">
-              {language === 'bn' ? 'ক্যাটাগরি নির্বাচন করুন' : 'SELECT CATEGORY'}
+              {renderT('SELECT CATEGORY', 'ক্যাটাগরি নির্বাচন করুন')}
             </h2>
           </div>
           <button 
@@ -212,7 +230,7 @@ export const Practice: React.FC = () => {
               <div className="bg-card border border-border rounded-3xl p-6 mb-6 space-y-4 shadow-sm">
                 <h3 className="font-black text-sm uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2">
                   <Zap size={14} className="text-primary" />
-                  {language === 'bn' ? 'প্র্যাকটিস সেটিংস' : 'PRACTICE SETTINGS'}
+                  {renderT('PRACTICE SETTINGS', 'প্র্যাকটিস সেটিংস')}
                 </h3>
                 
                 <div className="grid gap-3">
@@ -224,7 +242,7 @@ export const Practice: React.FC = () => {
                       <div className={cn("p-2 rounded-lg", practiceSettings.onlyNew ? "bg-primary/20 text-primary" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400")}>
                         <Check size={16} />
                       </div>
-                      <span className="font-bold text-sm">{language === 'bn' ? 'শুধুমাত্র নতুন প্রশ্ন' : 'Only new questions'}</span>
+                      <span className="font-bold text-sm">{renderT('Only new questions', 'শুধুমাত্র নতুন প্রশ্ন')}</span>
                     </div>
                     <div className={cn("w-10 h-5 rounded-full relative transition-colors", practiceSettings.onlyNew ? "bg-primary" : "bg-zinc-300 dark:bg-zinc-700")}>
                       <div className={cn("absolute top-1 w-3 h-3 rounded-full bg-white transition-all", practiceSettings.onlyNew ? "right-1" : "left-1")} />
@@ -239,7 +257,7 @@ export const Practice: React.FC = () => {
                       <div className={cn("p-2 rounded-lg", practiceSettings.autoNext ? "bg-primary/20 text-primary" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400")}>
                         <ChevronRight size={16} />
                       </div>
-                      <span className="font-bold text-sm">{language === 'bn' ? 'অটো নেক্সট কোয়েশ্চেন' : 'Auto move next question'}</span>
+                      <span className="font-bold text-sm">{renderT('Auto move next question', 'অটো নেক্সট কোয়েশ্চেন')}</span>
                     </div>
                     <div className={cn("w-10 h-5 rounded-full relative transition-colors", practiceSettings.autoNext ? "bg-primary" : "bg-zinc-300 dark:bg-zinc-700")}>
                       <div className={cn("absolute top-1 w-3 h-3 rounded-full bg-white transition-all", practiceSettings.autoNext ? "right-1" : "left-1")} />
@@ -254,7 +272,7 @@ export const Practice: React.FC = () => {
                       <div className={cn("p-2 rounded-lg", practiceSettings.alertIncorrect ? "bg-primary/20 text-primary" : "bg-zinc-200 dark:bg-zinc-800 text-zinc-400")}>
                         <AlertCircle size={16} />
                       </div>
-                      <span className="font-bold text-sm">{language === 'bn' ? 'ভুল উত্তরে অ্যালার্ট' : 'Alert if answer is incorrect'}</span>
+                      <span className="font-bold text-sm">{renderT('Alert if answer is incorrect', 'ভুল উত্তরে অ্যালার্ট')}</span>
                     </div>
                     <div className={cn("w-10 h-5 rounded-full relative transition-colors", practiceSettings.alertIncorrect ? "bg-primary" : "bg-zinc-300 dark:bg-zinc-700")}>
                       <div className={cn("absolute top-1 w-3 h-3 rounded-full bg-white transition-all", practiceSettings.alertIncorrect ? "right-1" : "left-1")} />
@@ -262,7 +280,7 @@ export const Practice: React.FC = () => {
                   </button>
 
                   <div className="p-4 rounded-2xl bg-muted/30 space-y-3">
-                    <span className="font-bold text-sm block">{language === 'bn' ? 'সর্বোচ্চ প্রশ্ন সংখ্যা' : 'Maximum number of questions'}</span>
+                    <span className="font-bold text-sm block">{renderT('Maximum number of questions', 'সর্বোচ্চ প্রশ্ন সংখ্যা')}</span>
                     <div className="flex flex-wrap gap-2">
                       {[10, 20, 30, 40, 50, 'all'].map((num) => (
                         <button
@@ -275,7 +293,7 @@ export const Practice: React.FC = () => {
                               : "bg-background border border-border text-muted-foreground hover:border-primary/50"
                           )}
                         >
-                          {num === 'all' ? (language === 'bn' ? 'সব' : 'ALL') : num}
+                          {num === 'all' ? renderT('ALL', 'সব') : num}
                         </button>
                       ))}
                     </div>
@@ -292,7 +310,7 @@ export const Practice: React.FC = () => {
             className="bg-zinc-900 dark:bg-zinc-100 p-6 rounded-3xl text-left text-white dark:text-zinc-900 shadow-2xl shadow-zinc-900/20 dark:shadow-none hover:scale-[1.02] transition-all flex justify-between items-center group overflow-hidden relative"
           >
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-x-1/2 -translate-y-1/2"></div>
-            <span className="font-black text-xl uppercase tracking-widest relative z-10">{language === 'bn' ? 'সব প্রশ্ন' : 'ALL QUESTIONS'}</span>
+            <span className="font-black text-xl uppercase tracking-widest relative z-10">{renderT('ALL QUESTIONS', 'সব প্রশ্ন')}</span>
             <span className="text-xs font-black bg-white/20 px-4 py-1.5 rounded-full backdrop-blur-md relative z-10">{questions.length}</span>
           </button>
           
@@ -316,7 +334,11 @@ export const Practice: React.FC = () => {
                   count > 0 ? "hover:border-primary hover:bg-zinc-50 dark:hover:bg-zinc-900" : "opacity-40 cursor-not-allowed grayscale"
                 )}
               >
-                <span className="font-bold text-base leading-tight pr-6">{cat.name[language]}</span>
+                <div className="flex flex-col pr-6">
+                  <span className="font-bold text-base leading-tight">{cat.name.en}</span>
+                  {language === 'bilingual' && <span className="text-sm font-normal opacity-70">{cat.name.bn}</span>}
+                  {language === 'bn' && <span className="font-bold text-base leading-tight">{cat.name.bn}</span>}
+                </div>
                 <span className={cn(
                   "text-[10px] font-black px-3 py-1.5 rounded-full transition-all shrink-0 uppercase tracking-widest",
                   count > 0 ? "bg-muted text-muted-foreground group-hover:bg-primary group-hover:text-primary-foreground" : "bg-muted text-muted-foreground"
@@ -329,9 +351,23 @@ export const Practice: React.FC = () => {
     );
   }
 
-  const categoryName = selectedCategory === 'all' 
-    ? (language === 'bn' ? 'সব প্রশ্ন' : 'All Questions')
-    : categories.find(c => c.id === selectedCategory)?.name[language];
+  const renderCategoryName = () => {
+    if (selectedCategory === 'all') {
+      return renderT('All Questions', 'সব প্রশ্ন');
+    }
+    const cat = categories.find(c => c.id === selectedCategory);
+    if (!cat) return '';
+    
+    if (language === 'bilingual') {
+      return (
+        <span className="flex flex-col">
+          <span className="text-sm">{cat.name.en}</span>
+          <span className="text-xs font-normal opacity-70">{cat.name.bn}</span>
+        </span>
+      );
+    }
+    return cat.name[language as 'en' | 'bn'] || cat.name.en;
+  };
 
   const isLastQuestion = currentIndex === filteredQuestions.length - 1;
 
@@ -343,7 +379,7 @@ export const Practice: React.FC = () => {
           className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-1 bg-muted/50 px-3 py-1.5 rounded-full transition-colors"
         >
           <ChevronLeft size={16} />
-          {language === 'bn' ? 'ফিরে যান' : 'Back'}
+          {renderT('Back', 'ফিরে যান')}
         </button>
         <div className="text-sm font-bold bg-primary/10 text-primary px-4 py-1.5 rounded-full">
           {currentIndex + 1} <span className="text-primary/50 mx-1">/</span> {filteredQuestions.length}
@@ -351,7 +387,7 @@ export const Practice: React.FC = () => {
       </div>
 
         <div className="bg-gradient-to-r from-accent to-transparent p-4 rounded-2xl border border-accent flex justify-between items-center">
-          <h3 className="font-bold text-foreground line-clamp-1 mr-4">{categoryName}</h3>
+          <h3 className="font-bold text-foreground line-clamp-1 mr-4">{renderCategoryName()}</h3>
           <div className="flex gap-2">
             <button 
               onClick={() => setShowSettings(!showSettings)}
@@ -384,8 +420,8 @@ export const Practice: React.FC = () => {
                       <Zap size={18} className="text-primary" />
                       <span className="font-bold text-sm">
                         {isCaching 
-                          ? (language === 'bn' ? `অনুবাদ হচ্ছে... ${cacheProgress}%` : `Caching... ${cacheProgress}%`)
-                          : (language === 'bn' ? 'সব অনুবাদ সেভ করুন (অফলাইন)' : 'Pre-cache all (Offline)')
+                          ? renderT(`Caching... ${cacheProgress}%`, `অনুবাদ হচ্ছে... ${cacheProgress}%`)
+                          : renderT('Pre-cache all (Offline)', 'সব অনুবাদ সেভ করুন (অফলাইন)')
                         }
                       </span>
                     </div>
@@ -398,7 +434,7 @@ export const Practice: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <RotateCcw size={18} className="text-destructive" />
                       <span className="font-bold text-sm text-destructive">
-                        {language === 'bn' ? 'ক্যাশ মুছে ফেলুন' : 'Clear Cache'}
+                        {renderT('Clear Cache', 'ক্যাশ মুছে ফেলুন')}
                       </span>
                     </div>
                   </button>
@@ -423,7 +459,7 @@ export const Practice: React.FC = () => {
         </motion.div>
       ) : (
         <div className="text-center py-12 text-muted-foreground bg-card rounded-3xl border border-border">
-          {language === 'bn' ? 'কোনো প্রশ্ন পাওয়া যায়নি।' : 'No questions found.'}
+          {renderT('No questions found.', 'কোনো প্রশ্ন পাওয়া যায়নি।')}
         </div>
       )}
 
@@ -434,15 +470,15 @@ export const Practice: React.FC = () => {
           className="flex-1 py-4 rounded-2xl border-2 border-border font-bold disabled:opacity-50 flex items-center justify-center gap-2 hover:bg-muted transition-colors text-foreground"
         >
           <ChevronLeft size={20} />
-          {language === 'bn' ? 'আগেরটি' : 'Previous'}
+          {renderT('Previous', 'আগেরটি')}
         </button>
         <button
           onClick={handleNext}
           className="flex-1 py-4 rounded-2xl bg-primary text-primary-foreground font-bold flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
         >
           {isLastQuestion 
-            ? (language === 'bn' ? 'ফলাফল দেখুন' : 'View Results')
-            : (language === 'bn' ? 'পরবর্তী' : 'Next')
+            ? renderT('View Results', 'ফলাফল দেখুন')
+            : renderT('Next', 'পরবর্তী')
           }
           <ChevronRight size={20} />
         </button>

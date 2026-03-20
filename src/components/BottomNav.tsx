@@ -46,7 +46,14 @@ export const BottomNav: React.FC = () => {
                   )}
                   <item.icon size={22} className={cn("mb-1 transition-transform duration-300", isActive && "scale-110")} />
                   <span className={cn("text-[10px] font-bengali transition-all duration-300", isActive ? "font-bold" : "font-medium")}>
-                    {item.label[language]}
+                    {language === 'bilingual' ? (
+                      <span className="flex flex-col items-center leading-[1.1]">
+                        <span>{item.label.en}</span>
+                        <span className="text-[8px] opacity-70 font-normal">{item.label.bn}</span>
+                      </span>
+                    ) : (
+                      item.label[language as 'en' | 'bn'] || item.label.en
+                    )}
                   </span>
                 </>
               )}

@@ -49,7 +49,7 @@ interface AppState {
 export const useStore = create<AppState>()(
   persist(
     (set, get) => ({
-      language: 'bn',
+      language: 'bilingual',
       theme: 'light',
       wrongAnswers: [],
       mockTestScores: [],
@@ -63,7 +63,14 @@ export const useStore = create<AppState>()(
         alertIncorrect: false,
         maxQuestions: 'all',
       },
-      toggleLanguage: () => set((state) => ({ language: state.language === 'en' ? 'bn' : 'en' })),
+      toggleLanguage: () => set((state) => {
+        const nextLang: Record<Language, Language> = {
+          en: 'bn',
+          bn: 'bilingual',
+          bilingual: 'en'
+        };
+        return { language: nextLang[state.language] };
+      }),
       toggleTheme: () => set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
       addWrongAnswer: (id) => {
         set((state) => {

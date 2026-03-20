@@ -77,6 +77,18 @@ export const MockTest: React.FC = () => {
     }
   }, [currentIndex, language, nextQ]);
 
+  const renderT = (en: string, bn: string, isSmall = false) => {
+    if (language === 'bilingual') {
+      return (
+        <span className="flex flex-col">
+          <span className={isSmall ? "text-xs" : ""}>{en}</span>
+          <span className={isSmall ? "text-[10px] opacity-70 font-normal" : "text-sm opacity-70 font-normal"}>{bn}</span>
+        </span>
+      );
+    }
+    return language === 'bn' ? bn : en;
+  };
+
   if (testState === 'intro') {
     return (
       <div className="space-y-8 font-bengali text-center py-8 animate-in fade-in">
@@ -85,27 +97,27 @@ export const MockTest: React.FC = () => {
           <Timer size={56} className="text-primary relative z-10" />
         </div>
         <h2 className="text-3xl font-bold tracking-tight">
-          {language === 'bn' ? 'মক টেস্ট' : 'Mock Test'}
+          {renderT('Mock Test', 'মক টেস্ট')}
         </h2>
         <div className="space-y-4 text-muted-foreground max-w-sm mx-auto text-left bg-card p-8 rounded-3xl border border-border shadow-sm">
           <div className="flex items-center gap-3 font-medium">
             <div className="bg-green-100 dark:bg-green-500/20 p-2 rounded-lg text-green-600 dark:text-green-400"><CheckCircle2 size={20} /></div>
-            {language === 'bn' ? '৫০টি বহুনির্বাচনী প্রশ্ন' : '50 multiple choice questions'}
+            {renderT('50 multiple choice questions', '৫০টি বহুনির্বাচনী প্রশ্ন')}
           </div>
           <div className="flex items-center gap-3 font-medium">
             <div className="bg-blue-100 dark:bg-blue-500/20 p-2 rounded-lg text-blue-600 dark:text-blue-400"><Timer size={20} /></div>
-            {language === 'bn' ? 'সময়: ৫৭ মিনিট' : 'Time: 57 minutes'}
+            {renderT('Time: 57 minutes', 'সময়: ৫৭ মিনিট')}
           </div>
           <div className="flex items-center gap-3 font-medium">
             <div className="bg-orange-100 dark:bg-orange-500/20 p-2 rounded-lg text-orange-600 dark:text-orange-400"><AlertCircle size={20} /></div>
-            {language === 'bn' ? 'পাস মার্ক: ৪৩/৫০' : 'Pass mark: 43/50'}
+            {renderT('Pass mark: 43/50', 'পাস মার্ক: ৪৩/৫০')}
           </div>
         </div>
         <button
           onClick={startTest}
           className="w-full py-5 rounded-2xl bg-primary text-primary-foreground font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98]"
         >
-          {language === 'bn' ? 'টেস্ট শুরু করুন' : 'Start Test'}
+          {renderT('Start Test', 'টেস্ট শুরু করুন')}
         </button>
       </div>
     );
@@ -126,8 +138,8 @@ export const MockTest: React.FC = () => {
         
         <h2 className="text-3xl font-bold tracking-tight">
           {passed 
-            ? (language === 'bn' ? 'অভিনন্দন! আপনি পাস করেছেন' : 'Congratulations! You Passed')
-            : (language === 'bn' ? 'দুঃখিত, আপনি ফেল করেছেন' : 'Sorry, You Failed')
+            ? renderT('Congratulations! You Passed', 'অভিনন্দন! আপনি পাস করেছেন')
+            : renderT('Sorry, You Failed', 'দুঃখিত, আপনি ফেল করেছেন')
           }
         </h2>
         
@@ -137,8 +149,8 @@ export const MockTest: React.FC = () => {
         
         <p className="text-lg text-muted-foreground mb-8 font-medium">
           {passed 
-            ? (language === 'bn' ? 'দারুণ কাজ! আসল পরীক্ষার জন্য আপনি প্রস্তুত।' : 'Great job! You are ready for the real test.')
-            : (language === 'bn' ? 'হতাশ হবেন না। আরও অনুশীলন করুন।' : 'Don\'t give up. Keep practicing.')
+            ? renderT('Great job! You are ready for the real test.', 'দারুণ কাজ! আসল পরীক্ষার জন্য আপনি প্রস্তুত।')
+            : renderT('Don\'t give up. Keep practicing.', 'হতাশ হবেন না। আরও অনুশীলন করুন।')
           }
         </p>
 
@@ -147,7 +159,7 @@ export const MockTest: React.FC = () => {
           className="w-full py-5 rounded-2xl bg-primary text-primary-foreground font-bold text-lg hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 active:scale-[0.98] flex items-center justify-center gap-2"
         >
           <RefreshCcw size={24} />
-          {language === 'bn' ? 'আবার চেষ্টা করুন' : 'Try Again'}
+          {renderT('Try Again', 'আবার চেষ্টা করুন')}
         </button>
       </div>
     );

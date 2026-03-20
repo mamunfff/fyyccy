@@ -37,6 +37,18 @@ export const Profile: React.FC = () => {
     email: { en: 'Email', bn: 'ইমেইল' },
   };
 
+  const renderT = (item: { en: string; bn: string }, isSmall = false) => {
+    if (language === 'bilingual') {
+      return (
+        <span className="flex flex-col">
+          <span className={isSmall ? "text-xs" : ""}>{item.en}</span>
+          <span className={isSmall ? "text-[10px] opacity-70 font-normal" : "text-sm opacity-70 font-normal"}>{item.bn}</span>
+        </span>
+      );
+    }
+    return item[language as 'en' | 'bn'] || item.en;
+  };
+
   return (
     <div className="space-y-8 font-bengali animate-in fade-in duration-500">
       <div className="bg-gradient-to-br from-primary to-indigo-600 p-8 rounded-[2rem] text-white shadow-xl shadow-primary/20 relative overflow-hidden flex flex-col items-center text-center">
@@ -56,21 +68,21 @@ export const Profile: React.FC = () => {
       <div className="space-y-4">
         <h3 className="text-xl font-bold flex items-center gap-2 tracking-tight">
           <Award className="text-primary" />
-          {t.stats[language]}
+          {renderT(t.stats)}
         </h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-card p-5 rounded-3xl border border-border shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div className="text-4xl font-black text-primary tracking-tighter">{averageScore}<span className="text-lg text-muted-foreground font-medium">/50</span></div>
-            <div className="text-sm font-medium text-muted-foreground mt-1">{t.avgScore[language]}</div>
+            <div className="text-sm font-medium text-muted-foreground mt-1">{renderT(t.avgScore, true)}</div>
           </div>
           <div className="grid grid-rows-2 gap-4">
             <div className="bg-card p-4 rounded-3xl border border-border shadow-sm flex items-center justify-between px-6">
-              <div className="text-sm font-medium text-muted-foreground">{t.testsTaken[language]}</div>
+              <div className="text-sm font-medium text-muted-foreground">{renderT(t.testsTaken, true)}</div>
               <div className="text-2xl font-bold text-foreground">{mockTestScores.length}</div>
             </div>
             <div className="bg-card p-4 rounded-3xl border border-border shadow-sm flex items-center justify-between px-6">
-              <div className="text-sm font-medium text-muted-foreground">{t.wrongAns[language]}</div>
+              <div className="text-sm font-medium text-muted-foreground">{renderT(t.wrongAns, true)}</div>
               <div className="text-2xl font-bold text-destructive">{wrongAnswers.length}</div>
             </div>
           </div>
@@ -83,7 +95,7 @@ export const Profile: React.FC = () => {
           className="w-full bg-destructive/10 hover:bg-destructive text-destructive hover:text-destructive-foreground p-5 rounded-3xl border border-destructive/20 flex items-center justify-center gap-3 transition-all duration-300 shadow-sm font-bold text-lg group"
         >
           <LogOut size={24} className="group-hover:-translate-x-1 transition-transform" />
-          {t.logout[language]}
+          {renderT(t.logout)}
         </button>
       </div>
     </div>

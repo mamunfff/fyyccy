@@ -37,7 +37,10 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
 
   useEffect(() => {
     const translateIfNeeded = async () => {
-      if (language === 'bn' && question.text.bn === question.text.en) {
+      const needsTranslation = (language === 'bn' || language === 'bilingual') && 
+                                question.text.bn === question.text.en;
+      
+      if (needsTranslation) {
         if (translatingId.current === question.id) return;
         translatingId.current = question.id;
         
@@ -73,8 +76,27 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     }
   };
 
+  const renderText = (text: { en: string; bn: string }, isHeading = false) => {
+    if (language === 'bilingual') {
+      return (
+        <span className="flex flex-col gap-1">
+          <span className={cn(isHeading ? "text-xl font-semibold" : "font-medium text-base")}>{text.en}</span>
+          <span className={cn(isHeading ? "text-lg font-medium" : "text-sm font-normal", "text-primary/80 leading-relaxed font-bengali")}>{text.bn}</span>
+        </span>
+      );
+    }
+    return (
+      <span className={cn(
+        isHeading ? "text-xl font-semibold" : "font-medium text-base",
+        language === 'bn' ? "leading-relaxed font-bengali" : "leading-snug"
+      )}>
+        {text[language as 'en' | 'bn'] || text.en}
+      </span>
+    );
+  };
+
   return (
-    <div className="bg-card rounded-3xl border border-border overflow-hidden shadow-sm font-bengali">
+    <div className="bg-card rounded-3xl border border-border overflow-hidden shadow-sm">
       {question.imageUrl && (
         <div className="w-full h-56 bg-muted flex items-center justify-center p-4 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/5"></div>
@@ -91,15 +113,12 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
         {isTranslating && (
           <div className="absolute inset-0 bg-card/50 backdrop-blur-[1px] z-20 flex flex-col items-center justify-center gap-3">
             <Loader2 className="text-primary animate-spin" size={32} />
-            <p className="text-sm font-bold text-primary">অনুবাদ করা হচ্ছে...</p>
+            <p className="text-sm font-bold text-primary font-bengali">অনুবাদ করা হচ্ছে...</p>
           </div>
         )}
         
-        <h3 className={cn(
-          "text-xl font-semibold tracking-tight text-foreground",
-          language === 'bn' ? "leading-relaxed" : "leading-snug"
-        )}>
-          {question.text[language]}
+        <h3 className="tracking-tight text-foreground">
+          {renderText(question.text, true)}
         </h3>
         
         <div className="space-y-3">
@@ -135,12 +154,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
                     </motion.div>
                   )}
                 </div>
-                <span className={cn(
-                  "font-medium text-base",
-                  language === 'bn' ? "leading-relaxed" : "leading-normal"
-                )}>
-                  {option.text[language]}
-                </span>
+                {renderText(option.text)}
               </button>
             );
           })}
@@ -153,11 +167,18 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
             className="mt-6 p-5 bg-accent/50 rounded-2xl border border-accent"
           >
             <h4 className="font-bold text-primary mb-2 flex items-center gap-2">
-              {language === 'bn' ? 'ব্যাখ্যা' : 'Explanation'}
+              {language === 'bn' ? 'ব্যাখ্যা' : (language === 'bilingual' ? 'Explanation / ব্যাখ্যা' : 'Explanation')}
             </h4>
-            <p className="text-sm text-foreground/80 leading-relaxed font-medium">
-              {question.explanation[language]}
-            </p>
+            <div className="text-sm text-foreground/80 leading-relaxed font-medium">
+              {language === 'bilingual' ? (
+                <div className="flex flex-col gap-2">
+                  <p>{question.explanation.en}</p>
+                  <p className="text-primary/80 font-bengali">{question.explanation.bn}</p>
+                </div>
+              ) : (
+                <p className={language === 'bn' ? 'font-bengali' : ''}>{question.explanation[language]}</p>
+              )}
+            </div>
           </motion.div>
         )}
       </div>
